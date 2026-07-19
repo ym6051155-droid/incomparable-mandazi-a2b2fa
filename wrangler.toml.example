@@ -1,0 +1,7 @@
+name = "sust-library-api"
+main = "cloudflare-r2-worker.js"
+compatibility_date = "2026-07-19"
+
+[[r2_buckets]]
+binding = "SUST_LIBRARY"
+bucket_name = "ضع-اسم-bucket-هنا"
