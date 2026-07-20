@@ -65,8 +65,17 @@
   <h1>إدارة تنبيهات مكتبة SUST</h1>
   <p class="intro">
     اكتب الرسالة هنا، ثم نزّل ملف <code>notifications.json</code>
-    وارفعه إلى مستودع الموقع في GitHub.
+    وارفعه مباشرة إلى حاوية Cloudflare R2.
+    بعد استبدال الملف ستظهر الرسالة من دون تشغيل Netlify Deploy.
   </p>
+  <section class="card">
+    <strong>مكان رفع الملف في R2</strong>
+    <p class="intro" style="margin-top:8px">
+      الحاوية: <code>sust-elibrary</code><br>
+      اسم الملف: <code>notifications.json</code><br>
+      المسار: جذر الحاوية، وليس داخل مجلد المحاضرات.
+    </p>
+  </section>
 
   <section class="card">
     <h2>رسالة جديدة</h2>
@@ -125,10 +134,11 @@
     <h2>طريقة إرسال التنبيه</h2>
     <ol class="steps">
       <li>أضف الرسالة واضغط <strong>تنزيل notifications.json</strong>.</li>
-      <li>افتح مستودع GitHub المرتبط بموقع Netlify.</li>
-      <li>ارفع الملف إلى جذر المستودع واستبدل الملف القديم.</li>
-      <li>اضغط <strong>Commit changes</strong>.</li>
-      <li>بعد نجاح Netlify سيظهر التنبيه في جرس الموقع تلقائيًا.</li>
+      <li>افتح Cloudflare ثم ادخل إلى <strong>R2 Object Storage</strong>.</li>
+      <li>افتح الحاوية <code>sust-elibrary</code>.</li>
+      <li>ارفع الملف باسم <code>notifications.json</code> في جذر الحاوية، واستبدل النسخة القديمة.</li>
+      <li>لا تحتاج إلى GitHub أو Netlify؛ سيقرأ الموقع الرسالة من R2 مباشرة.</li>
+      <li>رابط الملف المستخدم: <code>https://pub-c9e3df8f82464009bba375c7b8a18044.r2.dev/notifications.json</code></li>
     </ol>
   </section>
 </main>

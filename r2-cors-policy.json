@@ -1,0 +1,12 @@
+[
+  {
+    "AllowedOrigins": [
+      "https://sust-library.site"
+    ],
+    "AllowedMethods": [
+      "GET",
+      "HEAD"
+    ],
+    "MaxAgeSeconds": 3600
+  }
+]
