@@ -2111,7 +2111,7 @@ html[dir="rtl"] .course-content-arrow {
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-  window.SUST_SITE_BUILD = "tabs-logo-fixed-v9-20260720";
+  window.SUST_SITE_BUILD = "hero-centered-v10-20260720";
 </script>
 
 
@@ -2197,6 +2197,35 @@ html[dir="rtl"] .course-content-arrow {
     .tab {
       font-size: .72rem !important;
       gap: .3rem !important;
+    }
+  }
+</style>
+
+
+<style id="hero-image-centering-fix">
+  /*
+    The original laboratory photo is portrait-shaped.
+    Enlarge it slightly and offset its crop so the visible composition
+    is centered inside the wide banner without leaving empty edges.
+  */
+  .lab-showcase {
+    overflow: hidden !important;
+  }
+
+  .lab-showcase img {
+    width: 102.5% !important;
+    max-width: none !important;
+    height: 100% !important;
+    position: relative;
+    left: -0.35%;
+    object-fit: cover !important;
+    object-position: center center !important;
+  }
+
+  @media (max-width: 700px) {
+    .lab-showcase img {
+      width: 104% !important;
+      left: -0.75%;
     }
   }
 </style>
