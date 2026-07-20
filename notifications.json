@@ -1,5 +1,18 @@
 {
   "version": 1,
-  "updatedAt": "2026-07-20T20:58:31.097388+00:00",
-  "notifications": []
+  "updatedAt": "2026-07-20T21:08:07.873734+00:00",
+  "notifications": [
+    {
+      "id": "telegram-files-request-2026-07-20",
+      "titleAr": "ساعدونا في إضافة ملفات المحاضرات",
+      "titleEn": "Help us add lecture files",
+      "bodyAr": "معليش يا شباب، حاليًا ما متوفرة عندي كل ملفات المحاضرات. لو عندكم أي محاضرات أو ملفات دراسية وعاوزين تساعدوا في تطوير المكتبة، ممكن ترسلوها لي عبر تيليجرام. حتلقوا وسيلة التواصل في أسفل الموقع عند أيقونة تيليجرام، أو اضغطوا على هذا التنبيه للانتقال مباشرة.",
+      "bodyEn": "Some lecture files are not available yet. If you have lectures or study materials and would like to help improve the library, please send them through Telegram. You can use the Telegram icon at the bottom of the website or tap this notification.",
+      "publishedAt": "2026-07-20T21:08:07.873757+00:00",
+      "expiresAt": "",
+      "link": "https://t.me/Mohmet880",
+      "type": "info",
+      "enabled": true
+    }
+  ]
 }
