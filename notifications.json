@@ -1,17 +1,29 @@
 {
   "version": 1,
-  "updatedAt": "2026-07-20T21:08:07.873734+00:00",
+  "updatedAt": "2026-07-20T21:51:22.285Z",
   "notifications": [
     {
-      "id": "telegram-files-request-2026-07-20",
-      "titleAr": "ساعدونا في إضافة ملفات المحاضرات",
-      "titleEn": "Help us add lecture files",
+      "id": "notice-1784584274504-mtopbi",
+      "titleAr": "عاوزين دعمكم",
+      "titleEn": "عاوزين دعمكم",
       "bodyAr": "معليش يا شباب، حاليًا ما متوفرة عندي كل ملفات المحاضرات. لو عندكم أي محاضرات أو ملفات دراسية وعاوزين تساعدوا في تطوير المكتبة، ممكن ترسلوها لي عبر تيليجرام. حتلقوا وسيلة التواصل في أسفل الموقع عند أيقونة تيليجرام، أو اضغطوا على هذا التنبيه للانتقال مباشرة.",
-      "bodyEn": "Some lecture files are not available yet. If you have lectures or study materials and would like to help improve the library, please send them through Telegram. You can use the Telegram icon at the bottom of the website or tap this notification.",
-      "publishedAt": "2026-07-20T21:08:07.873757+00:00",
+      "bodyEn": "معليش يا شباب، حاليًا ما متوفرة عندي كل ملفات المحاضرات. لو عندكم أي محاضرات أو ملفات دراسية وعاوزين تساعدوا في تطوير المكتبة، ممكن ترسلوها لي عبر تيليجرام. حتلقوا وسيلة التواصل في أسفل الموقع عند أيقونة تيليجرام، أو اضغطوا على هذا التنبيه للانتقال مباشرة.",
+      "publishedAt": "2026-07-20T21:49:00.000Z",
       "expiresAt": "",
       "link": "https://t.me/Mohmet880",
-      "type": "info",
+      "type": "warning",
+      "enabled": true
+    },
+    {
+      "id": "notice-1784582714481-kfdktm",
+      "titleAr": "ترحيب",
+      "titleEn": "ترحيب",
+      "bodyAr": "سلام عليكم يا شباب مرحب بيكم نورتونا",
+      "bodyEn": "سلام عليكم يا شباب مرحب بيكم نورتونا",
+      "publishedAt": "2026-07-20T21:24:00.000Z",
+      "expiresAt": "",
+      "link": "",
+      "type": "new",
       "enabled": true
     }
   ]
