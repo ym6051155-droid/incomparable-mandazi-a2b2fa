@@ -2161,6 +2161,20 @@ html[dir="rtl"] .course-content-arrow {
 }
 </style>
 
+
+<script id="sust-library-api-config">
+  window.SUST_LIBRARY_API = "https://sust-library-api.sust88.workers.dev/api/library";
+  window.SUST_LIBRARY_WORKER_ORIGIN = "https://sust-library-api.sust88.workers.dev";
+</script>
+
+
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<script>
+  window.SUST_SITE_BUILD = "live-r2-v5-20260720";
+</script>
+
 </head>
 <body id="top">
 
@@ -5877,16 +5891,88 @@ function buildCourseRoot(card) {
   return program + '/semester-' + semesterNumber + '/' + folderSlug(courseEnglish) + '/';
 }
 
+function encodeObjectKeyForWorker(key) {
+  return String(key || '')
+    .split('/')
+    .filter(Boolean)
+    .map(function(part) { return encodeURIComponent(part); })
+    .join('/');
+}
+
+function extractFileNumber(filename) {
+  var stem = String(filename || '').replace(/\.[^.]+$/, '');
+  var markerMatch = stem.match(/(?:lecture|lec)[\s_-]*(.*)$/i);
+  var relevant = markerMatch ? markerMatch[1] : stem;
+  var numbers = relevant.match(/\d+/g) || [];
+
+  if (!numbers.length) {
+    var fallback = stem.match(/\d+/g) || [];
+    if (fallback.length) numbers = [fallback[fallback.length - 1]];
+  }
+
+  if (!numbers.length) return '';
+
+  var unique = [];
+  numbers.forEach(function(number) {
+    if (unique.indexOf(number) === -1) unique.push(number);
+  });
+
+  unique.sort(function(a, b) { return Number(a) - Number(b); });
+  return unique.join('–');
+}
+
+function generatedFileLabel(category, number, language) {
+  var labels = {
+    lectures: ['المحاضرة', 'Lecture'],
+    tutorials: ['التوتريال', 'Tutorial'],
+    assessments: ['المتابعة', 'Assessment'],
+    explanations: ['الشرح', 'Explanation'],
+    references: ['المرجع', 'Reference'],
+    exams: ['الامتحان', 'Exam']
+  };
+  var pair = labels[category] || ['الملف', 'File'];
+  var base = language === 'ar' ? pair[0] : pair[1];
+  return number ? base + ' ' + number : base;
+}
+
 function normalizeFile(file) {
   var normalized = Object.assign({}, file);
   normalized.courseRoot = String(normalized.courseRoot || '').replace(/^\/+/, '');
   normalized.category = normalized.category || 'lectures';
   normalized.file = normalized.file || normalized.name || '';
-  normalized.url = normalized.url || normalized.courseRoot + normalized.category + '/' + normalized.file;
-  normalized.mime = normalized.mime || 'application/pdf';
-  normalized.number = normalized.number || '';
-  normalized.labelAr = normalized.labelAr || normalized.file;
-  normalized.labelEn = normalized.labelEn || normalized.file;
+  normalized.mime = normalized.mime || 'application/octet-stream';
+
+  var extractedNumber = extractFileNumber(normalized.file);
+  normalized.number = extractedNumber || normalized.number || '';
+
+  normalized.labelAr = generatedFileLabel(
+    normalized.category,
+    normalized.number,
+    'ar'
+  );
+  normalized.labelEn = generatedFileLabel(
+    normalized.category,
+    normalized.number,
+    'en'
+  );
+
+  var objectKey =
+    normalized.courseRoot +
+    normalized.category +
+    '/' +
+    normalized.file;
+
+  var workerOrigin =
+    window.SUST_LIBRARY_WORKER_ORIGIN ||
+    (window.SUST_LIBRARY_API
+      ? new URL(window.SUST_LIBRARY_API, window.location.href).origin
+      : '');
+
+  normalized.url =
+    workerOrigin +
+    '/files/' +
+    encodeObjectKeyForWorker(objectKey);
+
   return normalized;
 }
 
@@ -5921,27 +6007,52 @@ function buildInventory(data) {
 }
 
 async function fetchJSON(url) {
-  var response = await fetch(url, { cache: 'no-store' });
+  var requestURL = new URL(url, window.location.href);
+  requestURL.searchParams.set('_refresh', Date.now().toString());
+
+  var response = await fetch(requestURL.toString(), {
+    cache: 'no-store',
+    headers: {
+      'Accept': 'application/json'
+    }
+  });
+
   if (!response.ok) throw new Error('HTTP ' + response.status);
+
   var data = await response.json();
-  if (!data || !Array.isArray(data.files)) throw new Error('Invalid library data');
+  if (!data || !Array.isArray(data.files)) {
+    throw new Error('Invalid library data');
+  }
+
   return data;
 }
 
 async function loadLibraryData() {
-  var endpoints = [];
-  if (window.SUST_LIBRARY_API) endpoints.push(window.SUST_LIBRARY_API);
-  endpoints.push('/api/library', 'library-manifest.json');
-
-  for (var i = 0; i < endpoints.length; i++) {
-    try {
-      var data = await fetchJSON(endpoints[i]);
-      libraryData = data;
-      libraryData.source = endpoints[i];
-      return;
-    } catch (error) {}
+  if (!window.SUST_LIBRARY_API) {
+    libraryData = {
+      version: 1,
+      updatedAt: new Date().toISOString(),
+      source: 'api-not-configured',
+      files: [],
+      courseMeta: {}
+    };
+    return;
   }
-  // The embedded manifest keeps the site functional when opened locally or offline.
+
+  try {
+    var data = await fetchJSON(window.SUST_LIBRARY_API);
+    libraryData = data;
+    libraryData.source = 'cloudflare-r2-live';
+  } catch (error) {
+    console.error('SUST Library API error:', error);
+    libraryData = {
+      version: 1,
+      updatedAt: new Date().toISOString(),
+      source: 'api-error',
+      files: [],
+      courseMeta: {}
+    };
+  }
 }
 
 function groupFor(courseRoot, categoryKey) {
@@ -6229,9 +6340,19 @@ function renderLatest() {
     container.appendChild(item);
   });
   if (update) {
-    update.textContent = libraryData.updatedAt
-      ? currentText('آخر تحديث: ', 'Last update: ') + formatDate(libraryData.updatedAt)
-      : currentText('يتم تحديثها من بيانات المكتبة', 'Updated from the library data');
+    if (libraryData.source === 'cloudflare-r2-live') {
+      update.textContent =
+        currentText('متصل مباشرة بـ R2 · النسخة المباشرة V5 · آخر تحديث: ',
+                    'Live from R2 · Direct build V5 · Last update: ') +
+        formatDate(libraryData.updatedAt);
+    } else if (libraryData.source === 'api-error') {
+      update.textContent =
+        currentText('تعذر الاتصال بـ R2 حاليًا', 'Could not connect to R2');
+    } else {
+      update.textContent = libraryData.updatedAt
+        ? currentText('آخر تحديث: ', 'Last update: ') + formatDate(libraryData.updatedAt)
+        : currentText('يتم تحديثها من بيانات المكتبة', 'Updated from the library data');
+    }
   }
 }
 
@@ -6346,7 +6467,8 @@ function openResourceCategory(card, category) {
     group.files.forEach(function(file) {
       var row = document.createElement('div');
       row.className = 'lecture-list-item';
-      var metadata = ['PDF'];
+      var extension = String(file.file || '').split('.').pop().toUpperCase();
+      var metadata = [extension || 'FILE'];
       var size = formatBytes(file.size);
       var added = formatDate(file.addedAt);
       if (size) metadata.push(size);
@@ -6878,7 +7000,33 @@ function setupEvents() {
   });
 }
 
+
+async function removeOldSiteCache() {
+  try {
+    if ('serviceWorker' in navigator) {
+      var registrations = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(
+        registrations.map(function(registration) {
+          return registration.unregister();
+        })
+      );
+    }
+
+    if ('caches' in window) {
+      var cacheKeys = await caches.keys();
+      await Promise.all(
+        cacheKeys.map(function(key) {
+          return caches.delete(key);
+        })
+      );
+    }
+  } catch (error) {
+    console.warn('Could not clear old cache:', error);
+  }
+}
+
 async function initialize() {
+  await removeOldSiteCache();
   setupEvents();
   setupCourseCards();
   applyTheme(state.theme);
@@ -6902,9 +7050,6 @@ async function initialize() {
   if (activeContent) showSemesterOverview(activeContent);
   applyLanguage(state.language);
 
-  if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) {
-    navigator.serviceWorker.register('sw.js').catch(function() {});
-  }
 }
 
 initialize();
