@@ -1,23 +1,22 @@
 {
-  "name": "SUST Academic Library",
-  "short_name": "SUST Library",
-  "description": "مكتبة طلابية لتنظيم المواد الدراسية لكلية هندسة وتكنولوجيا الصناعات.",
-  "lang": "ar",
-  "dir": "rtl",
-  "start_url": "./index.html",
-  "scope": "./",
+  "id": "/?pwa=v9",
+  "name": "مكتبة SUST الأكاديمية",
+  "short_name": "مكتبة SUST",
+  "description": "مكتبة طلابية لمواد كلية هندسة وتكنولوجيا الصناعات",
+  "start_url": "/?pwa=v9",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#f5f7fa",
-  "theme_color": "#1f5fae",
+  "background_color": "#f5f7fb",
+  "theme_color": "#1565c0",
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "/icon-192.png?v=9",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "icon-512.png",
+      "src": "/icon-512.png?v=9",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"

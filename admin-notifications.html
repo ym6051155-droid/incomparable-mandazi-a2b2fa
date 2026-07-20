@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#1f5fae">
+  <title>إدارة تنبيهات مكتبة SUST</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --accent:#1f5fae;
+      --bg:#f3f6fa;
+      --card:#fff;
+      --text:#172033;
+      --muted:#64748b;
+      --border:#d8e0ea;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;background:var(--bg);color:var(--text);
+      font-family:system-ui,-apple-system,sans-serif;
+    }
+    main{width:min(760px,100%);margin:auto;padding:18px 14px 60px}
+    h1{font-size:1.45rem;margin:0 0 7px}
+    .intro{color:var(--muted);line-height:1.8;margin:0 0 16px}
+    .card{
+      background:var(--card);border:1px solid var(--border);
+      border-radius:16px;padding:16px;margin-bottom:14px;
+      box-shadow:0 8px 22px rgba(15,23,42,.06)
+    }
+    label{display:block;font-weight:750;font-size:.86rem;margin:12px 0 6px}
+    input,textarea,select{
+      width:100%;border:1px solid var(--border);border-radius:10px;
+      padding:11px 12px;background:#fff;color:var(--text);
+      font:inherit
+    }
+    textarea{min-height:92px;resize:vertical}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}
+    button,.file-label{
+      min-height:43px;border:1px solid #9eb2c7;border-radius:10px;
+      background:#fff;color:#174f7d;font:inherit;font-weight:800;
+      padding:9px 14px;cursor:pointer;text-align:center
+    }
+    button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+    button.danger{color:#b91c1c}
+    #fileInput{display:none}
+    .message{
+      border:1px solid var(--border);border-radius:12px;
+      padding:12px;margin-top:10px;background:#fafcff
+    }
+    .message h3{font-size:.95rem;margin:0 0 6px}
+    .message p{font-size:.8rem;color:var(--muted);line-height:1.7;margin:0 0 8px;white-space:pre-wrap}
+    .message-meta{font-size:.7rem;color:var(--muted)}
+    .message-actions{display:flex;justify-content:flex-end;margin-top:8px}
+    .empty{text-align:center;color:var(--muted);padding:24px 8px}
+    .steps{margin:0;padding-inline-start:22px;color:var(--muted);line-height:2}
+    code{direction:ltr;display:inline-block;background:#edf3f9;padding:2px 6px;border-radius:6px}
+    .status{margin-top:10px;color:#166534;font-weight:750;font-size:.82rem}
+    @media(max-width:600px){.grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<main>
+  <h1>إدارة تنبيهات مكتبة SUST</h1>
+  <p class="intro">
+    اكتب الرسالة هنا، ثم نزّل ملف <code>notifications.json</code>
+    وارفعه إلى مستودع الموقع في GitHub.
+  </p>
+
+  <section class="card">
+    <h2>رسالة جديدة</h2>
+
+    <label for="titleAr">العنوان بالعربية</label>
+    <input id="titleAr" placeholder="مثال: تمت إضافة محاضرات جديدة">
+
+    <label for="bodyAr">نص الرسالة بالعربية</label>
+    <textarea id="bodyAr" placeholder="اكتب تفاصيل التحديث…"></textarea>
+
+    <label for="titleEn">العنوان بالإنجليزية — اختياري</label>
+    <input id="titleEn" placeholder="New lectures added">
+
+    <label for="bodyEn">نص الرسالة بالإنجليزية — اختياري</label>
+    <textarea id="bodyEn" placeholder="Write the update details…"></textarea>
+
+    <div class="grid">
+      <div>
+        <label for="type">نوع الرسالة</label>
+        <select id="type">
+          <option value="update">تحديث</option>
+          <option value="new">جديد</option>
+          <option value="info">معلومة</option>
+          <option value="warning">تنبيه مهم</option>
+        </select>
+      </div>
+      <div>
+        <label for="publishedAt">وقت النشر</label>
+        <input id="publishedAt" type="datetime-local">
+      </div>
+    </div>
+
+    <label for="link">رابط عند الضغط — اختياري</label>
+    <input id="link" placeholder="/ أو رابط صفحة محددة">
+
+    <div class="actions">
+      <button class="primary" id="addMessage" type="button">إضافة الرسالة</button>
+      <button id="clearForm" type="button">مسح الحقول</button>
+    </div>
+    <div class="status" id="formStatus"></div>
+  </section>
+
+  <section class="card">
+    <h2>الرسائل الحالية</h2>
+    <div id="messagesList"></div>
+
+    <div class="actions">
+      <button class="primary" id="downloadJson" type="button">تنزيل notifications.json</button>
+      <label class="file-label" for="fileInput">استيراد الملف الحالي</label>
+      <input id="fileInput" type="file" accept=".json,application/json">
+      <button class="danger" id="deleteAll" type="button">حذف كل الرسائل</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>طريقة إرسال التنبيه</h2>
+    <ol class="steps">
+      <li>أضف الرسالة واضغط <strong>تنزيل notifications.json</strong>.</li>
+      <li>افتح مستودع GitHub المرتبط بموقع Netlify.</li>
+      <li>ارفع الملف إلى جذر المستودع واستبدل الملف القديم.</li>
+      <li>اضغط <strong>Commit changes</strong>.</li>
+      <li>بعد نجاح Netlify سيظهر التنبيه في جرس الموقع تلقائيًا.</li>
+    </ol>
+  </section>
+</main>
+
+<script>
+(function(){
+  'use strict';
+
+  var STORAGE_KEY = 'sust-notification-admin-draft-v1';
+  var messages = loadDraft();
+
+  var titleAr = document.getElementById('titleAr');
+  var bodyAr = document.getElementById('bodyAr');
+  var titleEn = document.getElementById('titleEn');
+  var bodyEn = document.getElementById('bodyEn');
+  var type = document.getElementById('type');
+  var publishedAt = document.getElementById('publishedAt');
+  var link = document.getElementById('link');
+  var list = document.getElementById('messagesList');
+  var status = document.getElementById('formStatus');
+
+  function localDateTimeValue(date) {
+    var adjusted = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+    return adjusted.toISOString().slice(0,16);
+  }
+
+  if (!publishedAt.value) {
+    publishedAt.value = localDateTimeValue(new Date());
+  }
+
+  function loadDraft() {
+    try {
+      var saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+      return Array.isArray(saved) ? saved : [];
+    } catch (error) {
+      return [];
+    }
+  }
+
+  function saveDraft() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+  }
+
+  function makeId() {
+    return 'notice-' + Date.now() + '-' + Math.random().toString(36).slice(2,8);
+  }
+
+  function clearForm() {
+    titleAr.value = '';
+    bodyAr.value = '';
+    titleEn.value = '';
+    bodyEn.value = '';
+    link.value = '';
+    type.value = 'update';
+    publishedAt.value = localDateTimeValue(new Date());
+  }
+
+  function render() {
+    list.replaceChildren();
+
+    if (!messages.length) {
+      var empty = document.createElement('div');
+      empty.className = 'empty';
+      empty.textContent = 'لا توجد رسائل محفوظة.';
+      list.appendChild(empty);
+      return;
+    }
+
+    messages
+      .slice()
+      .sort(function(a,b){
+        return Date.parse(b.publishedAt) - Date.parse(a.publishedAt);
+      })
+      .forEach(function(message){
+        var card = document.createElement('article');
+        card.className = 'message';
+
+        var heading = document.createElement('h3');
+        heading.textContent = message.titleAr;
+
+        var paragraph = document.createElement('p');
+        paragraph.textContent = message.bodyAr;
+
+        var meta = document.createElement('div');
+        meta.className = 'message-meta';
+        meta.textContent =
+          new Date(message.publishedAt).toLocaleString('ar-SD') +
+          ' · ' + message.type;
+
+        var actions = document.createElement('div');
+        actions.className = 'message-actions';
+
+        var remove = document.createElement('button');
+        remove.type = 'button';
+        remove.className = 'danger';
+        remove.textContent = 'حذف';
+        remove.addEventListener('click', function(){
+          messages = messages.filter(function(item){ return item.id !== message.id; });
+          saveDraft();
+          render();
+        });
+
+        actions.appendChild(remove);
+        card.appendChild(heading);
+        if (paragraph.textContent) card.appendChild(paragraph);
+        card.appendChild(meta);
+        card.appendChild(actions);
+        list.appendChild(card);
+      });
+  }
+
+  document.getElementById('addMessage').addEventListener('click', function(){
+    var arTitle = titleAr.value.trim();
+    var arBody = bodyAr.value.trim();
+
+    if (!arTitle) {
+      status.textContent = 'اكتب عنوان الرسالة أولًا.';
+      return;
+    }
+
+    var publishDate = publishedAt.value
+      ? new Date(publishedAt.value)
+      : new Date();
+
+    messages.push({
+      id: makeId(),
+      titleAr: arTitle,
+      titleEn: titleEn.value.trim() || arTitle,
+      bodyAr: arBody,
+      bodyEn: bodyEn.value.trim() || arBody,
+      publishedAt: publishDate.toISOString(),
+      expiresAt: '',
+      link: link.value.trim(),
+      type: type.value,
+      enabled: true
+    });
+
+    saveDraft();
+    clearForm();
+    render();
+    status.textContent = 'تمت إضافة الرسالة. نزّل الملف عندما تنتهي.';
+  });
+
+  document.getElementById('clearForm').addEventListener('click', function(){
+    clearForm();
+    status.textContent = '';
+  });
+
+  document.getElementById('downloadJson').addEventListener('click', function(){
+    var payload = {
+      version: 1,
+      updatedAt: new Date().toISOString(),
+      notifications: messages.slice().sort(function(a,b){
+        return Date.parse(b.publishedAt) - Date.parse(a.publishedAt);
+      })
+    };
+
+    var blob = new Blob(
+      [JSON.stringify(payload, null, 2)],
+      { type: 'application/json;charset=utf-8' }
+    );
+
+    var url = URL.createObjectURL(blob);
+    var anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = 'notifications.json';
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
+
+    status.textContent = 'تم تنزيل notifications.json.';
+  });
+
+  document.getElementById('fileInput').addEventListener('change', function(event){
+    var file = event.target.files && event.target.files[0];
+    if (!file) return;
+
+    var reader = new FileReader();
+    reader.onload = function(){
+      try {
+        var data = JSON.parse(reader.result);
+        var imported = Array.isArray(data)
+          ? data
+          : Array.isArray(data.notifications)
+            ? data.notifications
+            : [];
+
+        messages = imported.filter(function(item){ return item && item.id; });
+        saveDraft();
+        render();
+        status.textContent = 'تم استيراد الملف الحالي.';
+      } catch (error) {
+        status.textContent = 'الملف غير صالح.';
+      }
+    };
+    reader.readAsText(file);
+    event.target.value = '';
+  });
+
+  document.getElementById('deleteAll').addEventListener('click', function(){
+    if (!confirm('هل تريد حذف جميع الرسائل؟')) return;
+    messages = [];
+    saveDraft();
+    render();
+    status.textContent = 'تم حذف كل الرسائل من المسودة.';
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

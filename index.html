@@ -2111,7 +2111,7 @@ html[dir="rtl"] .course-content-arrow {
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-  window.SUST_SITE_BUILD = "hero-centered-v10-20260720";
+  window.SUST_SITE_BUILD = "notifications-v14-20260720";
 </script>
 
 
@@ -2202,30 +2202,244 @@ html[dir="rtl"] .course-content-arrow {
 </style>
 
 
-<style id="hero-image-centering-fix">
-  /*
-    The original laboratory photo is portrait-shaped.
-    Enlarge it slightly and offset its crop so the visible composition
-    is centered inside the wide banner without leaving empty edges.
-  */
-  .lab-showcase {
-    overflow: hidden !important;
+<style id="hero-frame-exact-position-v13">
+  /* Exact value selected in the tester: 66% = 15.4px to the right */
+  @media (max-width: 820px) {
+    .lab-showcase {
+      transform: translateX(15.4px);
+    }
   }
+</style>
 
-  .lab-showcase img {
-    width: 102.5% !important;
-    max-width: none !important;
-    height: 100% !important;
+
+<style id="site-notifications-styles">
+  .notification-bell-btn {
     position: relative;
-    left: -0.35%;
-    object-fit: cover !important;
-    object-position: center center !important;
+    padding: 0 !important;
   }
 
-  @media (max-width: 700px) {
-    .lab-showcase img {
-      width: 104% !important;
-      left: -0.75%;
+  .notification-badge {
+    position: absolute;
+    top: -7px;
+    inset-inline-end: -7px;
+    min-width: 19px;
+    height: 19px;
+    padding: 0 5px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #dc2626;
+    color: #fff;
+    border: 2px solid var(--bg-primary);
+    font-size: .62rem;
+    font-weight: 850;
+    line-height: 1;
+  }
+
+  .notification-badge[hidden] {
+    display: none !important;
+  }
+
+  .notifications-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100000;
+    background: rgba(15,23,42,.54);
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: max(78px, env(safe-area-inset-top)) 14px 20px;
+    backdrop-filter: blur(3px);
+  }
+
+  .notifications-overlay[hidden] {
+    display: none !important;
+  }
+
+  .notifications-panel {
+    width: min(520px, 100%);
+    max-height: calc(100vh - 105px);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    box-shadow: 0 22px 60px rgba(15,23,42,.3);
+  }
+
+  .notifications-panel-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .notifications-panel-title {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .notifications-panel-title h2 {
+    margin: 0;
+    font-size: 1.15rem;
+  }
+
+  .notifications-panel-title p {
+    margin: 4px 0 0;
+    color: var(--text-secondary);
+    font-size: .75rem;
+  }
+
+  .notifications-close {
+    width: 39px;
+    height: 39px;
+    flex: 0 0 39px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: 1.35rem;
+    cursor: pointer;
+  }
+
+  .notifications-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface-muted);
+  }
+
+  .notifications-toolbar span {
+    color: var(--text-secondary);
+    font-size: .76rem;
+  }
+
+  .notifications-mark-all {
+    border: 0;
+    background: transparent;
+    color: var(--accent);
+    font-family: inherit;
+    font-size: .76rem;
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  .notifications-list {
+    overflow: auto;
+    padding: 12px;
+  }
+
+  .notification-card {
+    position: relative;
+    display: block;
+    width: 100%;
+    text-align: start;
+    padding: 14px 14px 14px 17px;
+    margin-bottom: 10px;
+    border: 1px solid var(--border);
+    border-radius: 13px;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-family: inherit;
+    cursor: pointer;
+  }
+
+  html[dir="rtl"] .notification-card {
+    padding: 14px 17px 14px 14px;
+  }
+
+  .notification-card.unread {
+    border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
+    background: color-mix(in srgb, var(--accent) 7%, var(--bg-secondary));
+  }
+
+  .notification-card.unread::before {
+    content: "";
+    position: absolute;
+    top: 17px;
+    inset-inline-start: 7px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #dc2626;
+  }
+
+  .notification-card-title {
+    margin: 0;
+    padding-inline-end: 82px;
+    font-size: .93rem;
+    font-weight: 850;
+    line-height: 1.45;
+  }
+
+  .notification-card-body {
+    margin: 7px 0 0;
+    color: var(--text-secondary);
+    font-size: .8rem;
+    line-height: 1.7;
+    white-space: pre-wrap;
+  }
+
+  .notification-card-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 10px;
+    color: var(--text-secondary);
+    font-size: .69rem;
+  }
+
+  .notification-type {
+    position: absolute;
+    top: 12px;
+    inset-inline-end: 12px;
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: var(--surface-muted);
+    color: var(--accent);
+    font-size: .65rem;
+    font-weight: 800;
+  }
+
+  .notifications-empty,
+  .notifications-error {
+    padding: 38px 18px;
+    text-align: center;
+    color: var(--text-secondary);
+    line-height: 1.8;
+  }
+
+  .notifications-error {
+    color: #b91c1c;
+  }
+
+  body.notifications-open {
+    overflow: hidden;
+  }
+
+  @media (max-width: 560px) {
+    .notifications-overlay {
+      align-items: flex-end;
+      padding: 0;
+    }
+
+    .notifications-panel {
+      width: 100%;
+      max-height: 86vh;
+      border-radius: 20px 20px 0 0;
+      border-bottom: 0;
+    }
+
+    .notification-card-title {
+      padding-inline-end: 72px;
     }
   }
 </style>
@@ -2336,7 +2550,7 @@ html[dir="rtl"] .course-content-arrow {
 </div>
 </div>
 
-<div class="header-right"><div class="header-tools"><button aria-label="Switch language" class="utility-btn" id="langToggle" title="English" type="button">EN</button><button aria-label="Toggle dark mode" class="utility-btn" id="themeToggle" title="Dark mode" type="button"><svg class="ui-icon" aria-hidden="true"><use href="#icon-moon"></use></svg></button></div><div class="header-stats">
+<div class="header-right"><div class="header-tools"><button aria-label="فتح التنبيهات" class="utility-btn notification-bell-btn" id="notificationsToggle" title="التنبيهات" type="button"><svg class="ui-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path><path d="M10 21h4"></path></svg><span class="notification-badge" id="notificationBadge" hidden>0</span></button><button aria-label="Switch language" class="utility-btn" id="langToggle" title="English" type="button">EN</button><button aria-label="Toggle dark mode" class="utility-btn" id="themeToggle" title="Dark mode" type="button"><svg class="ui-icon" aria-hidden="true"><use href="#icon-moon"></use></svg></button></div><div class="header-stats">
 <div class="stat-item"><div class="stat-value">5</div><div class="stat-label" data-ar="تخصصات" data-en="Programs">تخصصات</div></div>
 <div class="stat-item"><div class="stat-value" id="totalSubjects">0</div><div class="stat-label" data-ar="مواد" data-en="Courses">مواد</div></div>
 <div class="stat-item"><div class="stat-value" id="totalFiles">0</div><div class="stat-label" data-ar="ملفات" data-en="Files">ملفات</div></div>
@@ -7043,6 +7257,368 @@ async function initialize() {
 }
 
 initialize();
+</script>
+
+
+<div class="notifications-overlay" id="notificationsOverlay" hidden>
+  <section
+    class="notifications-panel"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="notificationsPanelTitle"
+  >
+    <div class="notifications-panel-header">
+      <div class="notifications-panel-title">
+        <h2 id="notificationsPanelTitle">تنبيهات الموقع</h2>
+        <p id="notificationsPanelSubtitle">آخر الرسائل والتحديثات من إدارة المكتبة</p>
+      </div>
+      <button
+        class="notifications-close"
+        id="notificationsClose"
+        type="button"
+        aria-label="إغلاق"
+      >×</button>
+    </div>
+
+    <div class="notifications-toolbar">
+      <span id="notificationsCountText">لا توجد رسائل جديدة</span>
+      <button
+        class="notifications-mark-all"
+        id="notificationsMarkAll"
+        type="button"
+      >تحديد الكل كمقروء</button>
+    </div>
+
+    <div class="notifications-list" id="notificationsList">
+      <div class="notifications-empty">جارٍ تحميل التنبيهات…</div>
+    </div>
+  </section>
+</div>
+
+
+<script id="site-notifications-script">
+(function () {
+  'use strict';
+
+  var DATA_URL = '/notifications.json';
+  var STORAGE_KEY = 'sust-read-notification-ids-v1';
+  var POLL_INTERVAL = 60000;
+
+  var notifications = [];
+  var readIds = loadReadIds();
+
+  var toggle = document.getElementById('notificationsToggle');
+  var badge = document.getElementById('notificationBadge');
+  var overlay = document.getElementById('notificationsOverlay');
+  var closeButton = document.getElementById('notificationsClose');
+  var markAllButton = document.getElementById('notificationsMarkAll');
+  var list = document.getElementById('notificationsList');
+  var countText = document.getElementById('notificationsCountText');
+  var panelTitle = document.getElementById('notificationsPanelTitle');
+  var panelSubtitle = document.getElementById('notificationsPanelSubtitle');
+
+  if (!toggle || !badge || !overlay || !list) return;
+
+  function isArabic() {
+    return (document.documentElement.lang || 'ar').toLowerCase().startsWith('ar');
+  }
+
+  function text(ar, en) {
+    return isArabic() ? ar : en;
+  }
+
+  function loadReadIds() {
+    try {
+      var saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+      return new Set(Array.isArray(saved) ? saved.map(String) : []);
+    } catch (error) {
+      return new Set();
+    }
+  }
+
+  function saveReadIds() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(readIds)));
+    } catch (error) {}
+  }
+
+  function normalizeNotification(item) {
+    if (!item || !item.id) return null;
+
+    return {
+      id: String(item.id),
+      titleAr: String(item.titleAr || item.title || ''),
+      titleEn: String(item.titleEn || item.titleAr || item.title || ''),
+      bodyAr: String(item.bodyAr || item.body || ''),
+      bodyEn: String(item.bodyEn || item.bodyAr || item.body || ''),
+      publishedAt: item.publishedAt || item.date || new Date().toISOString(),
+      expiresAt: item.expiresAt || '',
+      link: String(item.link || ''),
+      type: String(item.type || 'update'),
+      enabled: item.enabled !== false
+    };
+  }
+
+  function activeNotifications(rawItems) {
+    var now = Date.now();
+
+    return rawItems
+      .map(normalizeNotification)
+      .filter(function (item) {
+        if (!item || !item.enabled) return false;
+
+        var publishTime = Date.parse(item.publishedAt);
+        if (!Number.isNaN(publishTime) && publishTime > now) return false;
+
+        if (item.expiresAt) {
+          var expiryTime = Date.parse(item.expiresAt);
+          if (!Number.isNaN(expiryTime) && expiryTime < now) return false;
+        }
+
+        return true;
+      })
+      .sort(function (a, b) {
+        return Date.parse(b.publishedAt) - Date.parse(a.publishedAt);
+      });
+  }
+
+  function unreadItems() {
+    return notifications.filter(function (item) {
+      return !readIds.has(item.id);
+    });
+  }
+
+  function updateBadge() {
+    var count = unreadItems().length;
+
+    if (count > 0) {
+      badge.hidden = false;
+      badge.textContent = count > 99 ? '99+' : String(count);
+      toggle.setAttribute(
+        'aria-label',
+        text('فتح التنبيهات، ' + count + ' غير مقروءة',
+             'Open notifications, ' + count + ' unread')
+      );
+    } else {
+      badge.hidden = true;
+      badge.textContent = '0';
+      toggle.setAttribute(
+        'aria-label',
+        text('فتح التنبيهات', 'Open notifications')
+      );
+    }
+  }
+
+  function formatDate(value) {
+    var date = new Date(value);
+    if (Number.isNaN(date.getTime())) return '';
+
+    try {
+      return new Intl.DateTimeFormat(
+        isArabic() ? 'ar-SD' : 'en-GB',
+        { dateStyle: 'medium', timeStyle: 'short' }
+      ).format(date);
+    } catch (error) {
+      return date.toLocaleString();
+    }
+  }
+
+  function typeLabel(type) {
+    var labels = {
+      update: ['تحديث', 'Update'],
+      info: ['معلومة', 'Info'],
+      warning: ['تنبيه مهم', 'Important'],
+      new: ['جديد', 'New']
+    };
+    var pair = labels[type] || labels.update;
+    return text(pair[0], pair[1]);
+  }
+
+  function markRead(id) {
+    readIds.add(String(id));
+    saveReadIds();
+    updateBadge();
+    render();
+  }
+
+  function markAllRead() {
+    notifications.forEach(function (item) {
+      readIds.add(item.id);
+    });
+    saveReadIds();
+    updateBadge();
+    render();
+  }
+
+  function createCard(item) {
+    var card = document.createElement('button');
+    card.type = 'button';
+    card.className =
+      'notification-card' + (readIds.has(item.id) ? '' : ' unread');
+
+    var type = document.createElement('span');
+    type.className = 'notification-type';
+    type.textContent = typeLabel(item.type);
+
+    var title = document.createElement('h3');
+    title.className = 'notification-card-title';
+    title.textContent = isArabic() ? item.titleAr : item.titleEn;
+
+    var body = document.createElement('p');
+    body.className = 'notification-card-body';
+    body.textContent = isArabic() ? item.bodyAr : item.bodyEn;
+
+    var meta = document.createElement('div');
+    meta.className = 'notification-card-meta';
+
+    var date = document.createElement('span');
+    date.textContent = formatDate(item.publishedAt);
+
+    var action = document.createElement('span');
+    action.textContent = item.link
+      ? text('اضغط للفتح', 'Tap to open')
+      : text(readIds.has(item.id) ? 'مقروء' : 'اضغط لتحديده كمقروء',
+             readIds.has(item.id) ? 'Read' : 'Tap to mark as read');
+
+    meta.appendChild(date);
+    meta.appendChild(action);
+
+    card.appendChild(type);
+    card.appendChild(title);
+    if (body.textContent) card.appendChild(body);
+    card.appendChild(meta);
+
+    card.addEventListener('click', function () {
+      markRead(item.id);
+
+      if (item.link) {
+        if (/^https?:\/\//i.test(item.link)) {
+          window.location.href = item.link;
+        } else {
+          window.location.href = new URL(item.link, window.location.origin).href;
+        }
+      }
+    });
+
+    return card;
+  }
+
+  function render() {
+    panelTitle.textContent = text('تنبيهات الموقع', 'Site notifications');
+    panelSubtitle.textContent = text(
+      'آخر الرسائل والتحديثات من إدارة المكتبة',
+      'Latest messages and updates from the library'
+    );
+    closeButton.setAttribute('aria-label', text('إغلاق', 'Close'));
+    markAllButton.textContent = text(
+      'تحديد الكل كمقروء',
+      'Mark all as read'
+    );
+
+    var unreadCount = unreadItems().length;
+    countText.textContent = unreadCount
+      ? text(
+          unreadCount + ' رسالة غير مقروءة',
+          unreadCount + ' unread message' + (unreadCount === 1 ? '' : 's')
+        )
+      : text('لا توجد رسائل جديدة', 'No new messages');
+
+    list.replaceChildren();
+
+    if (!notifications.length) {
+      var empty = document.createElement('div');
+      empty.className = 'notifications-empty';
+      empty.textContent = text(
+        'لا توجد تنبيهات منشورة حاليًا.',
+        'There are no published notifications.'
+      );
+      list.appendChild(empty);
+      return;
+    }
+
+    notifications.forEach(function (item) {
+      list.appendChild(createCard(item));
+    });
+  }
+
+  async function loadNotifications(showError) {
+    try {
+      var requestUrl = DATA_URL + '?refresh=' + Date.now();
+      var response = await fetch(requestUrl, {
+        cache: 'no-store',
+        headers: { 'Accept': 'application/json' }
+      });
+
+      if (!response.ok) {
+        throw new Error('HTTP ' + response.status);
+      }
+
+      var data = await response.json();
+      var items = Array.isArray(data)
+        ? data
+        : Array.isArray(data.notifications)
+          ? data.notifications
+          : [];
+
+      notifications = activeNotifications(items);
+      updateBadge();
+      render();
+    } catch (error) {
+      if (showError) {
+        list.replaceChildren();
+        var errorBox = document.createElement('div');
+        errorBox.className = 'notifications-error';
+        errorBox.textContent = text(
+          'تعذر تحميل التنبيهات حاليًا.',
+          'Notifications could not be loaded.'
+        );
+        list.appendChild(errorBox);
+      }
+    }
+  }
+
+  function openPanel() {
+    overlay.hidden = false;
+    document.body.classList.add('notifications-open');
+    render();
+    loadNotifications(true);
+  }
+
+  function closePanel() {
+    overlay.hidden = true;
+    document.body.classList.remove('notifications-open');
+  }
+
+  toggle.addEventListener('click', openPanel);
+  closeButton.addEventListener('click', closePanel);
+  markAllButton.addEventListener('click', markAllRead);
+
+  overlay.addEventListener('click', function (event) {
+    if (event.target === overlay) closePanel();
+  });
+
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape' && !overlay.hidden) closePanel();
+  });
+
+  var languageObserver = new MutationObserver(function () {
+    render();
+    updateBadge();
+  });
+  languageObserver.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['lang', 'dir']
+  });
+
+  document.addEventListener('visibilitychange', function () {
+    if (!document.hidden) loadNotifications(false);
+  });
+
+  loadNotifications(false);
+  setInterval(function () {
+    if (!document.hidden) loadNotifications(false);
+  }, POLL_INTERVAL);
+})();
 </script>
 
 </body>
