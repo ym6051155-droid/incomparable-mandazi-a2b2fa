@@ -2164,7 +2164,7 @@ html[dir="rtl"] .course-content-arrow {
 
 <script id="sust-library-api-config">
   window.SUST_LIBRARY_API = "https://sust-library-api.sust88.workers.dev/api/library";
-  window.SUST_LIBRARY_WORKER_ORIGIN = "https://sust-library-api.sust88.workers.dev";
+  window.SUST_LIBRARY_PUBLIC_R2 = "https://pub-c9e3df8f82464009bba375c7b8a18044.r2.dev";
 </script>
 
 
@@ -2172,7 +2172,7 @@ html[dir="rtl"] .course-content-arrow {
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-  window.SUST_SITE_BUILD = "live-r2-v5-20260720";
+  window.SUST_SITE_BUILD = "public-r2-final-v6-20260720";
 </script>
 
 </head>
@@ -5962,15 +5962,13 @@ function normalizeFile(file) {
     '/' +
     normalized.file;
 
-  var workerOrigin =
-    window.SUST_LIBRARY_WORKER_ORIGIN ||
-    (window.SUST_LIBRARY_API
-      ? new URL(window.SUST_LIBRARY_API, window.location.href).origin
-      : '');
+  var publicR2Origin =
+    window.SUST_LIBRARY_PUBLIC_R2 ||
+    'https://pub-c9e3df8f82464009bba375c7b8a18044.r2.dev';
 
   normalized.url =
-    workerOrigin +
-    '/files/' +
+    publicR2Origin.replace(/\/$/, '') +
+    '/' +
     encodeObjectKeyForWorker(objectKey);
 
   return normalized;
@@ -6342,8 +6340,8 @@ function renderLatest() {
   if (update) {
     if (libraryData.source === 'cloudflare-r2-live') {
       update.textContent =
-        currentText('متصل مباشرة بـ R2 · النسخة المباشرة V5 · آخر تحديث: ',
-                    'Live from R2 · Direct build V5 · Last update: ') +
+        currentText('متصل بـ R2 · تنزيل مباشر · النسخة V6 · آخر تحديث: ',
+                    'Connected to R2 · Direct download · Build V6 · Last update: ') +
         formatDate(libraryData.updatedAt);
     } else if (libraryData.source === 'api-error') {
       update.textContent =
