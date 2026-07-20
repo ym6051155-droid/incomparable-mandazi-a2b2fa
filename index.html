@@ -1154,8 +1154,6 @@ html[dir="rtl"] .spec-header { border-right:4px solid var(--spec-color,var(--acc
 <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
 <meta name="apple-mobile-web-app-title" content="SUST Library"/>
 <link rel="manifest" href="manifest.webmanifest"/>
-<link rel="apple-touch-icon" href="icon-192.png"/>
-<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png"/>
 
 
 <style id="student-experience-upgrade">
@@ -1219,7 +1217,6 @@ html[data-theme="dark"] .install-app-btn { color: var(--accent-light); }
   padding: 1.05rem;
   box-shadow: var(--shadow-sm);
 }
-.dashboard-panel.latest-panel { grid-column: 1 / -1; }
 .dashboard-heading {
   display: flex;
   align-items: center;
@@ -1271,36 +1268,6 @@ html[data-theme="dark"] .install-app-btn { color: var(--accent-light); }
 .continue-title { font-size: .86rem; font-weight: 700; }
 .continue-meta { font-size: .7rem; color: var(--text-secondary); margin-top:.15rem; }
 
-.latest-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(225px, 1fr));
-  gap: .65rem;
-}
-.latest-item {
-  display: flex;
-  align-items: center;
-  gap: .7rem;
-  padding: .75rem;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--bg-secondary);
-}
-.latest-file-icon {
-  width: 36px; height: 36px;
-  display: grid; place-items:center;
-  border-radius: 9px;
-  color: var(--accent);
-  background: color-mix(in srgb, var(--accent) 9%, var(--surface-muted));
-}
-.latest-info { min-width:0; flex:1; }
-.latest-title {
-  display:block; font-size:.78rem; font-weight:700;
-  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-}
-.latest-course {
-  display:block; font-size:.66rem; color:var(--text-secondary);
-  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-}
 .download-only-btn {
   border: 1px solid color-mix(in srgb, var(--accent) 42%, var(--border));
   background: color-mix(in srgb, var(--accent) 8%, var(--bg-secondary));
@@ -1419,13 +1386,11 @@ html[data-theme="dark"] .download-only-btn { color: var(--accent-light); }
 
 @media (max-width: 760px) {
   .student-dashboard { grid-template-columns: 1fr; }
-  .dashboard-panel.latest-panel { grid-column:auto; }
   .smart-filters { display:grid; grid-template-columns:1fr 1fr; }
   .filter-field select, .filter-favorite-btn, .install-app-btn { width:100%; }
 }
 @media (max-width: 480px) {
   .smart-filters { grid-template-columns:1fr; }
-  .latest-grid { grid-template-columns:1fr; }
   .file-row { align-items:flex-start; }
   .file-row-actions { align-items:stretch; }
   .download-only-btn { min-width:88px; }
@@ -1535,9 +1500,6 @@ body {
   min-width: 0;
 }
 .lecture-details,
-.latest-info {
-  min-width: 0;
-}
 
 /* Main mobile layout */
 @media (max-width: 700px) {
@@ -1652,28 +1614,6 @@ body {
   .dashboard-icon {
     width: 34px;
     height: 34px;
-  }
-
-  .latest-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: .5rem;
-  }
-  .latest-item {
-    display: grid;
-    grid-template-columns: 34px minmax(0, 1fr) 40px;
-    gap: .55rem;
-    padding: .65rem;
-  }
-  .latest-file-icon {
-    width: 34px;
-    height: 34px;
-  }
-  .latest-item .download-only-btn {
-    width: 40px;
-    min-width: 40px;
-    height: 38px;
-    padding: 0;
   }
 
   .container {
@@ -2172,8 +2112,16 @@ html[dir="rtl"] .course-content-arrow {
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-  window.SUST_SITE_BUILD = "public-r2-final-v6-20260720";
+  window.SUST_SITE_BUILD = "public-r2-logo-no-latest-v8-20260720";
 </script>
+
+
+  <link rel="icon" type="image/x-icon" href="favicon.ico?v=7">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=7">
+  <link rel="icon" type="image/png" sizes="48x48" href="favicon-48.png?v=7">
+  <link rel="icon" type="image/png" sizes="96x96" href="icon-96.png?v=7">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=7">
+  <link rel="manifest" href="manifest.webmanifest?v=7">
 
 </head>
 <body id="top">
@@ -2357,17 +2305,6 @@ html[dir="rtl"] .course-content-arrow {
       </div>
     </div>
     <div class="dashboard-list" id="favoritesList"></div>
-  </article>
-
-  <article class="dashboard-panel latest-panel">
-    <div class="dashboard-heading">
-      <span class="dashboard-icon"><svg class="ui-icon" aria-hidden="true"><use href="#icon-file-down"></use></svg></span>
-      <div>
-        <h2 data-ar="أحدث الملفات المتاحة" data-en="Latest available files">أحدث الملفات المتاحة</h2>
-        <p id="lastLibraryUpdate" data-ar="يتم تحديثها من بيانات المكتبة" data-en="Updated from the library data">يتم تحديثها من بيانات المكتبة</p>
-      </div>
-    </div>
-    <div class="latest-grid" id="latestFiles"></div>
   </article>
 </section>
 
@@ -5845,7 +5782,7 @@ function applyLanguage(language) {
     refreshResourceFolders();
     renderFavorites();
     renderContinue();
-    renderLatest();
+
     searchSubjects();
   }
 }
@@ -6300,57 +6237,6 @@ function renderContinue() {
     link.addEventListener('click', function() {
       showStatus('بدأ تنزيل آخر ملف فتحته', 'Downloading your last opened file');
     });
-  }
-}
-
-function latestFilesList() {
-  return (libraryData.files || []).map(normalizeFile).slice().sort(function(a, b) {
-    var dateCompare = String(b.addedAt || '').localeCompare(String(a.addedAt || ''));
-    if (dateCompare) return dateCompare;
-    return (b.sort || 0) - (a.sort || 0);
-  }).slice(0, 6);
-}
-
-function renderLatest() {
-  var container = document.getElementById('latestFiles');
-  var update = document.getElementById('lastLibraryUpdate');
-  if (!container) return;
-  container.innerHTML = '';
-  var latest = latestFilesList();
-  if (!latest.length) {
-    container.innerHTML = '<p class="dashboard-empty">' +
-      currentText('لا توجد ملفات مضافة حتى الآن.', 'No files have been added yet.') +
-      '</p>';
-  }
-  latest.forEach(function(file) {
-    var item = document.createElement('div');
-    item.className = 'latest-item';
-    item.innerHTML =
-      '<span class="latest-file-icon">' + iconMarkup('file-text') + '</span>' +
-      '<span class="latest-info">' +
-        '<span class="latest-title">' + escapeHTML(fileDisplayTitle(file)) + '</span>' +
-        '<span class="latest-course">' + escapeHTML(courseNameForRoot(file.courseRoot)) + '</span>' +
-      '</span>' +
-      '<a class="download-only-btn" href="' + encodeURI(file.url) + '" download aria-label="' +
-        currentText('تحميل الملف', 'Download file') + '">' + iconMarkup('download') + '</a>';
-    var link = item.querySelector('a');
-    link.addEventListener('click', function() { saveLastOpened(file); });
-    container.appendChild(item);
-  });
-  if (update) {
-    if (libraryData.source === 'cloudflare-r2-live') {
-      update.textContent =
-        currentText('متصل بـ R2 · تنزيل مباشر · النسخة V6 · آخر تحديث: ',
-                    'Connected to R2 · Direct download · Build V6 · Last update: ') +
-        formatDate(libraryData.updatedAt);
-    } else if (libraryData.source === 'api-error') {
-      update.textContent =
-        currentText('تعذر الاتصال بـ R2 حاليًا', 'Could not connect to R2');
-    } else {
-      update.textContent = libraryData.updatedAt
-        ? currentText('آخر تحديث: ', 'Last update: ') + formatDate(libraryData.updatedAt)
-        : currentText('يتم تحديثها من بيانات المكتبة', 'Updated from the library data');
-    }
   }
 }
 
@@ -7038,7 +6924,6 @@ async function initialize() {
   refreshFavoriteButtons();
   renderFavorites();
   renderContinue();
-  renderLatest();
 
   document.getElementById('totalFiles').textContent = (libraryData.files || []).length;
   document.querySelectorAll('.content').forEach(function(content) {
