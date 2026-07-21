@@ -2112,7 +2112,7 @@ html[dir="rtl"] .course-content-arrow {
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-  window.SUST_SITE_BUILD = "notifications-github-v17-20260721";
+  window.SUST_SITE_BUILD = "language-hero-positions-v19-20260721";
 </script>
 
 
@@ -2441,6 +2441,21 @@ html[dir="rtl"] .course-content-arrow {
 
     .notification-card-title {
       padding-inline-end: 72px;
+    }
+  }
+</style>
+
+
+<style id="language-specific-hero-position-v19">
+  /* Arabic approved position: 66% = 15.4px to the right */
+  /* English approved position: 33% = 16.3px to the left */
+  @media (max-width: 820px) {
+    html[lang="ar"] .lab-showcase {
+      transform: translateX(15.4px) !important;
+    }
+
+    html[lang="en"] .lab-showcase {
+      transform: translateX(-16.3px) !important;
     }
   }
 </style>
