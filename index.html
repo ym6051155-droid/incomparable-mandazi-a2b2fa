@@ -7750,5 +7750,34 @@ initialize();
 })();
 </script>
 
+
+<script>
+  (function hideAndroidDownloadButtonInsideApp() {
+    var isNativeAndroidApp =
+      /SUSTLibraryAndroid/i.test(navigator.userAgent || "");
+
+    if (!isNativeAndroidApp) return;
+
+    function hideButton() {
+      var button = document.getElementById("installApp");
+
+      if (button) {
+        button.hidden = true;
+        button.style.setProperty("display", "none", "important");
+        button.setAttribute("aria-hidden", "true");
+        button.removeAttribute("href");
+      }
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", hideButton, {
+        once: true
+      });
+    } else {
+      hideButton();
+    }
+  })();
+</script>
+
 </body>
 </html>
