@@ -1,7 +1,19 @@
 {
   "version": 1,
-  "updatedAt": "2026-07-20T21:51:22.285Z",
+  "updatedAt": "2026-07-22T14:33:48.827Z",
   "notifications": [
+    {
+      "id": "notice-1784730820979-mt4gth",
+      "titleAr": "تحديث جديد في مكتبة SUST 🚀",
+      "titleEn": "New update in the SUST library",
+      "bodyAr": "يا شباب، تم إطلاق تطبيق SUST Library لأجهزة أندرويد مع مجموعة من التحسينات الجديدة، منها تنزيل المحاضرات والملفات مباشرة على الهاتف، تحسين شكل ووضوح أيقونة التطبيق، وإضافة صفحة سياسة الخصوصية.\n\nيمكنكم تنزيل التطبيق من زر «تحميل تطبيق أندرويد» الموجود داخل الموقع. ولو عندكم أي ملاحظات أو واجهتكم مشكلة، تواصلوا معانا عبر تيليجرام.",
+      "bodyEn": "A new SUST Library update is available 🚀\n\nThe SUST Library Android app is now available with several improvements, including direct lecture and file downloads, a new high-quality app icon, and a privacy policy page.\n\nYou can download the app using the “Download Android App” button on the website. For feedback or technical issues, contact us through Telegram.",
+      "publishedAt": "2026-07-22T14:31:00.000Z",
+      "expiresAt": "",
+      "link": "https://sust-library.site",
+      "type": "new",
+      "enabled": true
+    },
     {
       "id": "notice-1784584274504-mtopbi",
       "titleAr": "عاوزين دعمكم",
