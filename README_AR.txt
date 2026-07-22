@@ -1,26 +1,36 @@
-إصلاح تنزيل المحاضرات داخل تطبيق SUST Library
+أيقونة تطبيق SUST Library — دقة عالية
 
-سبب المشكلة:
-التطبيق القديم كان يرسل أي رابط خارج sust-library.site إلى تطبيق خارجي.
-لأن ملفات المحاضرات موجودة في Cloudflare R2، تم فتح Google Drive أو
-عارض المستندات بدل تنزيل الملف، ثم ظهر خطأ «لا يمكن فتح الملف».
+تم تجهيز الأيقونة المرفوعة مع:
+- وضوح أعلى وحواف أكثر حدة.
+- لمعان خفيف واحترافي.
+- خلفية وإطار أبيضان.
+- المقاسات المطلوبة لأندرويد.
+- Adaptive Icon للأجهزة الحديثة.
+- أيقونات الموقع وPWA.
+- تحديث إصدار التطبيق إلى 1.0.2 ورقم الإصدار إلى 3.
 
-ما تم إصلاحه:
-- اعتراض روابط PDF وPPTX وDOCX وبقية ملفات المكتبة.
-- إرسالها مباشرة إلى Download Manager في أندرويد.
-- تنزيل الملفات إلى مجلد Downloads بدل فتح Google Drive.
-- رفع الإصدار إلى 1.0.1 ورقم الإصدار إلى 2.
+ارفع محتويات هذه الحزمة إلى جذر المستودع، مع استبدال الملفات المتعارضة.
 
-الملفات التي يجب استبدالها:
-android-app/app/src/main/java/site/sust/library/MainActivity.java
+أهم المسارات:
+android-app/app/src/main/res/drawable/
+android-app/app/src/main/res/mipmap-anydpi-v26/
+android-app/app/src/main/res/mipmap-mdpi/
+android-app/app/src/main/res/mipmap-hdpi/
+android-app/app/src/main/res/mipmap-xhdpi/
+android-app/app/src/main/res/mipmap-xxhdpi/
+android-app/app/src/main/res/mipmap-xxxhdpi/
 android-app/app/build.gradle
 
-بعد رفع التعديل إلى main:
-GitHub Actions سيبدأ تلقائيًا ويبني APK جديدًا.
+كما ستُستبدل أيقونات الموقع:
+icon-512.png
+icon-192.png
+icon-96.png
+apple-touch-icon.png
+favicon-48.png
+favicon-32.png
+
+بعد الرفع إلى main سيعمل GitHub Actions تلقائيًا ويبني APK جديدًا.
 
 مهم:
-لأن النسخة الحالية Debug، قد يرفض Android تثبيت النسخة الجديدة فوق
-القديمة بسبب اختلاف توقيع Debug بين عمليات البناء. في هذه الحالة:
-1. احذف تطبيق SUST Library القديم من الهاتف.
-2. نزّل APK الجديد.
-3. ثبّته من جديد.
+بسبب أن النسخة الحالية Debug، قد تحتاج إلى حذف تطبيق SUST Library القديم
+ثم تثبيت النسخة الجديدة حتى تظهر الأيقونة الجديدة بصورة صحيحة.
