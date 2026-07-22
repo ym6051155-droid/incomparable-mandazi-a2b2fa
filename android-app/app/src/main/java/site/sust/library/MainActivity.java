@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
+import android.webkit.MimeTypeMap;
 import android.webkit.URLUtil;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
@@ -26,6 +27,8 @@ import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+
+import java.util.Locale;
 
 public final class MainActivity extends Activity {
     private static final String HOME_URL = "https://sust-library.site/";
@@ -54,10 +57,13 @@ public final class MainActivity extends Activity {
             null,
             android.R.attr.progressBarStyleHorizontal
         );
-        FrameLayout.LayoutParams progressParams = new FrameLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            dp(3)
-        );
+
+        FrameLayout.LayoutParams progressParams =
+            new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                dp(3)
+            );
+
         progressParams.gravity = Gravity.TOP;
         progressBar.setLayoutParams(progressParams);
         progressBar.setMax(100);
@@ -69,14 +75,20 @@ public final class MainActivity extends Activity {
         configureWebView();
 
         String initialUrl = HOME_URL;
+
         if (savedInstanceState != null) {
             String restored = savedInstanceState.getString(STATE_URL);
+
             if (restored != null && !restored.isBlank()) {
                 initialUrl = restored;
             }
         } else {
             Uri incoming = getIntent().getData();
-            if (incoming != null && "sust-library.site".equalsIgnoreCase(incoming.getHost())) {
+
+            if (
+                incoming != null &&
+                "sust-library.site".equalsIgnoreCase(incoming.getHost())
+            ) {
                 initialUrl = incoming.toString();
             }
         }
@@ -86,6 +98,7 @@ public final class MainActivity extends Activity {
 
     private void configureWebView() {
         WebSettings settings = webView.getSettings();
+
         settings.setJavaScriptEnabled(true);
         settings.setDomStorageEnabled(true);
         settings.setDatabaseEnabled(true);
@@ -97,7 +110,8 @@ public final class MainActivity extends Activity {
         settings.setDisplayZoomControls(false);
         settings.setSupportZoom(false);
         settings.setUserAgentString(
-            settings.getUserAgentString() + " SUSTLibraryAndroid/1.0.0"
+            settings.getUserAgentString() +
+            " SUSTLibraryAndroid/1.0.1"
         );
 
         CookieManager cookies = CookieManager.getInstance();
@@ -106,10 +120,16 @@ public final class MainActivity extends Activity {
 
         webView.setWebChromeClient(new WebChromeClient() {
             @Override
-            public void onProgressChanged(WebView view, int newProgress) {
+            public void onProgressChanged(
+                WebView view,
+                int newProgress
+            ) {
                 progressBar.setProgress(newProgress);
+
                 progressBar.setVisibility(
-                    newProgress >= 100 ? View.GONE : View.VISIBLE
+                    newProgress >= 100
+                        ? View.GONE
+                        : View.VISIBLE
                 );
             }
         });
@@ -124,9 +144,23 @@ public final class MainActivity extends Activity {
                 String scheme = uri.getScheme();
                 String host = uri.getHost();
 
+                boolean isWebUrl =
+                    "http".equalsIgnoreCase(scheme) ||
+                    "https".equalsIgnoreCase(scheme);
+
+                if (isWebUrl && isDownloadUri(uri)) {
+                    startDownload(
+                        uri.toString(),
+                        view.getSettings().getUserAgentString(),
+                        null,
+                        mimeTypeFromUri(uri)
+                    );
+
+                    return true;
+                }
+
                 if (
-                    ("http".equalsIgnoreCase(scheme) ||
-                     "https".equalsIgnoreCase(scheme)) &&
+                    isWebUrl &&
                     (
                         "sust-library.site".equalsIgnoreCase(host) ||
                         host == null
@@ -145,7 +179,10 @@ public final class MainActivity extends Activity {
                 WebResourceRequest request,
                 WebResourceError error
             ) {
-                if (request.isForMainFrame() && !isOnline()) {
+                if (
+                    request.isForMainFrame() &&
+                    !isOnline()
+                ) {
                     showOfflinePage();
                 }
             }
@@ -170,6 +207,59 @@ public final class MainActivity extends Activity {
         });
     }
 
+    private boolean isDownloadUri(Uri uri) {
+        String path = uri.getPath();
+
+        if (path == null || path.isBlank()) {
+            return false;
+        }
+
+        String lowerPath = path.toLowerCase(Locale.ROOT);
+
+        return
+            lowerPath.endsWith(".pdf") ||
+            lowerPath.endsWith(".ppt") ||
+            lowerPath.endsWith(".pptx") ||
+            lowerPath.endsWith(".doc") ||
+            lowerPath.endsWith(".docx") ||
+            lowerPath.endsWith(".xls") ||
+            lowerPath.endsWith(".xlsx") ||
+            lowerPath.endsWith(".zip") ||
+            lowerPath.endsWith(".rar") ||
+            lowerPath.endsWith(".7z") ||
+            lowerPath.endsWith(".txt") ||
+            lowerPath.endsWith(".apk");
+    }
+
+    private String mimeTypeFromUri(Uri uri) {
+        String path = uri.getPath();
+
+        if (path == null) {
+            return "application/octet-stream";
+        }
+
+        int dotIndex = path.lastIndexOf('.');
+
+        if (
+            dotIndex < 0 ||
+            dotIndex >= path.length() - 1
+        ) {
+            return "application/octet-stream";
+        }
+
+        String extension = path
+            .substring(dotIndex + 1)
+            .toLowerCase(Locale.ROOT);
+
+        String mimeType = MimeTypeMap
+            .getSingleton()
+            .getMimeTypeFromExtension(extension);
+
+        return mimeType != null
+            ? mimeType
+            : "application/octet-stream";
+    }
+
     private void startDownload(
         String url,
         String userAgent,
@@ -186,49 +276,76 @@ public final class MainActivity extends Activity {
             DownloadManager.Request request =
                 new DownloadManager.Request(Uri.parse(url));
 
-            if (userAgent != null && !userAgent.isBlank()) {
-                request.addRequestHeader("User-Agent", userAgent);
+            if (
+                userAgent != null &&
+                !userAgent.isBlank()
+            ) {
+                request.addRequestHeader(
+                    "User-Agent",
+                    userAgent
+                );
             }
 
-            String cookie = CookieManager.getInstance().getCookie(url);
-            if (cookie != null && !cookie.isBlank()) {
-                request.addRequestHeader("Cookie", cookie);
+            String cookie =
+                CookieManager.getInstance().getCookie(url);
+
+            if (
+                cookie != null &&
+                !cookie.isBlank()
+            ) {
+                request.addRequestHeader(
+                    "Cookie",
+                    cookie
+                );
             }
 
-            if (mimeType != null && !mimeType.isBlank()) {
+            if (
+                mimeType != null &&
+                !mimeType.isBlank()
+            ) {
                 request.setMimeType(mimeType);
             }
 
             request.setTitle(fileName);
-            request.setDescription("تنزيل ملف من مكتبة SUST");
-            request.setNotificationVisibility(
-                DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED
+            request.setDescription(
+                "تنزيل ملف من مكتبة SUST"
             );
+
+            request.setNotificationVisibility(
+                DownloadManager.Request
+                    .VISIBILITY_VISIBLE_NOTIFY_COMPLETED
+            );
+
             request.setDestinationInExternalPublicDir(
                 Environment.DIRECTORY_DOWNLOADS,
                 fileName
             );
+
             request.setAllowedOverMetered(true);
             request.setAllowedOverRoaming(true);
 
             DownloadManager manager =
-                (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
+                (DownloadManager) getSystemService(
+                    Context.DOWNLOAD_SERVICE
+                );
 
             if (manager == null) {
-                throw new IllegalStateException("DownloadManager unavailable");
+                throw new IllegalStateException(
+                    "DownloadManager unavailable"
+                );
             }
 
             manager.enqueue(request);
+
             Toast.makeText(
                 this,
                 "بدأ تنزيل " + fileName,
                 Toast.LENGTH_LONG
             ).show();
         } catch (Exception error) {
-            openExternal(Uri.parse(url));
             Toast.makeText(
                 this,
-                "تم فتح رابط الملف في المتصفح",
+                "تعذر تنزيل الملف. افتحه من المتصفح وحاول مرة أخرى.",
                 Toast.LENGTH_LONG
             ).show();
         }
@@ -236,7 +353,9 @@ public final class MainActivity extends Activity {
 
     private void openExternal(Uri uri) {
         try {
-            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+            Intent intent =
+                new Intent(Intent.ACTION_VIEW, uri);
+
             startActivity(intent);
         } catch (Exception error) {
             Toast.makeText(
@@ -253,15 +372,21 @@ public final class MainActivity extends Activity {
                 Context.CONNECTIVITY_SERVICE
             );
 
-        if (manager == null) return false;
+        if (manager == null) {
+            return false;
+        }
 
         Network network = manager.getActiveNetwork();
-        if (network == null) return false;
+
+        if (network == null) {
+            return false;
+        }
 
         NetworkCapabilities capabilities =
             manager.getNetworkCapabilities(network);
 
-        return capabilities != null &&
+        return
+            capabilities != null &&
             (
                 capabilities.hasTransport(
                     NetworkCapabilities.TRANSPORT_WIFI
@@ -293,7 +418,9 @@ public final class MainActivity extends Activity {
             "</style></head><body><main class='card'>" +
             "<h1>لا يوجد اتصال بالإنترنت</h1>" +
             "<p>تحقق من الشبكة ثم اضغط إعادة المحاولة.</p>" +
-            "<button onclick=\"location.href='" + HOME_URL + "'\">إعادة المحاولة</button>" +
+            "<button onclick=\"location.href='" +
+            HOME_URL +
+            "'\">إعادة المحاولة</button>" +
             "</main></body></html>";
 
         webView.loadDataWithBaseURL(
@@ -307,23 +434,40 @@ public final class MainActivity extends Activity {
 
     private int dp(int value) {
         return Math.round(
-            value * getResources().getDisplayMetrics().density
+            value *
+            getResources()
+                .getDisplayMetrics()
+                .density
         );
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        String current = webView != null ? webView.getUrl() : HOME_URL;
-        outState.putString(STATE_URL, current);
+    protected void onSaveInstanceState(
+        Bundle outState
+    ) {
+        String current =
+            webView != null
+                ? webView.getUrl()
+                : HOME_URL;
+
+        outState.putString(
+            STATE_URL,
+            current
+        );
+
         super.onSaveInstanceState(outState);
     }
 
     @Override
     public void onBackPressed() {
-        if (webView != null && webView.canGoBack()) {
+        if (
+            webView != null &&
+            webView.canGoBack()
+        ) {
             webView.goBack();
             return;
         }
+
         super.onBackPressed();
     }
 
@@ -336,6 +480,7 @@ public final class MainActivity extends Activity {
             webView.destroy();
             webView = null;
         }
+
         super.onDestroy();
     }
 }

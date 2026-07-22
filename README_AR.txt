@@ -1,19 +1,26 @@
-مكتبة SUST — نسخة V19 مع تطبيق Android APK
+إصلاح تنزيل المحاضرات داخل تطبيق SUST Library
 
-المستودع:
-ym6051155-droid/incomparable-mandazi-a2b2fa
+سبب المشكلة:
+التطبيق القديم كان يرسل أي رابط خارج sust-library.site إلى تطبيق خارجي.
+لأن ملفات المحاضرات موجودة في Cloudflare R2، تم فتح Google Drive أو
+عارض المستندات بدل تنزيل الملف، ثم ظهر خطأ «لا يمكن فتح الملف».
 
-تمت إضافة:
-- زر «تحميل تطبيق أندرويد» داخل الموقع.
-- رابط التنزيل: /downloads/SUST-Library.apk
-- مشروع Android داخل android-app.
-- GitHub Actions لبناء APK تلقائيًا.
-- بناء Debug قابل للتثبيت حتى قبل إضافة أسرار التوقيع.
-- بناء Release تلقائي بعد إضافة أسرار التوقيع الأربعة.
+ما تم إصلاحه:
+- اعتراض روابط PDF وPPTX وDOCX وبقية ملفات المكتبة.
+- إرسالها مباشرة إلى Download Manager في أندرويد.
+- تنزيل الملفات إلى مجلد Downloads بدل فتح Google Drive.
+- رفع الإصدار إلى 1.0.1 ورقم الإصدار إلى 2.
 
-لا يحتاج هذا التحديث إلى تعديل Cloudflare Worker.
+الملفات التي يجب استبدالها:
+android-app/app/src/main/java/site/sust/library/MainActivity.java
+android-app/app/build.gradle
 
-بعد نجاح GitHub Actions يصبح رابط التطبيق:
-https://sust-library.site/downloads/SUST-Library.apk
+بعد رفع التعديل إلى main:
+GitHub Actions سيبدأ تلقائيًا ويبني APK جديدًا.
 
-قبل النشر في Google Play يجب استخدام نسخة Release موقعة بمفتاح دائم.
+مهم:
+لأن النسخة الحالية Debug، قد يرفض Android تثبيت النسخة الجديدة فوق
+القديمة بسبب اختلاف توقيع Debug بين عمليات البناء. في هذه الحالة:
+1. احذف تطبيق SUST Library القديم من الهاتف.
+2. نزّل APK الجديد.
+3. ثبّته من جديد.
