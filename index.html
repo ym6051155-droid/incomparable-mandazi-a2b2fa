@@ -2120,7 +2120,7 @@ html[dir="rtl"] .course-content-arrow {
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-  window.SUST_SITE_BUILD = "v19-roman-path-fix-20260722";
+  window.SUST_SITE_BUILD = "v19-apk-download-ready-20260722";
 </script>
 
 
@@ -2468,6 +2468,28 @@ html[dir="rtl"] .course-content-arrow {
   }
 </style>
 
+
+<style id="apk-download-v19-styles">
+  .apk-download-btn {
+    text-decoration: none;
+    justify-content: center;
+  }
+
+  .apk-download-btn:visited {
+    color: var(--accent-dark);
+  }
+
+  html[data-theme="dark"] .apk-download-btn:visited {
+    color: var(--accent-light);
+  }
+
+  @media (max-width: 700px) {
+    .apk-download-btn {
+      width: 100%;
+    }
+  }
+</style>
+
 </head>
 <body id="top">
 
@@ -2622,10 +2644,17 @@ html[dir="rtl"] .course-content-arrow {
     <svg class="ui-icon" aria-hidden="true"><use href="#icon-star"></use></svg>
     <span data-ar="المفضلة فقط" data-en="Favorites only">المفضلة فقط</span>
   </button>
-  <button class="install-app-btn" id="installApp" type="button" hidden>
+  <a
+    class="install-app-btn apk-download-btn"
+    id="installApp"
+    href="/downloads/SUST-Library.apk"
+    download="SUST-Library.apk"
+    type="application/vnd.android.package-archive"
+    aria-label="تحميل تطبيق SUST Library لأندرويد"
+  >
     <svg class="ui-icon" aria-hidden="true"><use href="#icon-install"></use></svg>
-    <span data-ar="تثبيت التطبيق" data-en="Install app">تثبيت التطبيق</span>
-  </button>
+    <span data-ar="تحميل تطبيق أندرويد" data-en="Download Android app">تحميل تطبيق أندرويد</span>
+  </a>
 </div>
 
 </div>
@@ -7284,24 +7313,16 @@ function setupEvents() {
     }
   });
 
-  window.addEventListener('beforeinstallprompt', function(event) {
-    event.preventDefault();
-    deferredInstallPrompt = event;
-    document.getElementById('installApp').hidden = false;
-  });
+  var apkDownloadButton = document.getElementById('installApp');
 
-  document.getElementById('installApp').addEventListener('click', async function() {
-    if (!deferredInstallPrompt) return;
-    deferredInstallPrompt.prompt();
-    await deferredInstallPrompt.userChoice;
-    deferredInstallPrompt = null;
-    this.hidden = true;
-  });
-
-  window.addEventListener('appinstalled', function() {
-    document.getElementById('installApp').hidden = true;
-    showStatus('تم تثبيت مكتبة SUST على جهازك', 'SUST Library was installed on your device');
-  });
+  if (apkDownloadButton) {
+    apkDownloadButton.addEventListener('click', function() {
+      showStatus(
+        'بدأ تنزيل تطبيق SUST Library لأندرويد',
+        'SUST Library Android app download started'
+      );
+    });
+  }
 }
 
 

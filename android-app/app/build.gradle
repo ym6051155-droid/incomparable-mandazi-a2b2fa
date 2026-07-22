@@ -1,0 +1,49 @@
+plugins {
+    id "com.android.application"
+}
+
+def signingReady =
+    System.getenv("SUST_KEYSTORE_FILE") &&
+    System.getenv("SUST_KEYSTORE_PASSWORD") &&
+    System.getenv("SUST_KEY_ALIAS") &&
+    System.getenv("SUST_KEY_PASSWORD")
+
+android {
+    namespace "site.sust.library"
+    compileSdk 36
+
+    defaultConfig {
+        applicationId "site.sust.library"
+        minSdk 23
+        targetSdk 36
+        versionCode 1
+        versionName "1.0.0"
+    }
+
+    signingConfigs {
+        release {
+            if (signingReady) {
+                storeFile file(System.getenv("SUST_KEYSTORE_FILE"))
+                storePassword System.getenv("SUST_KEYSTORE_PASSWORD")
+                keyAlias System.getenv("SUST_KEY_ALIAS")
+                keyPassword System.getenv("SUST_KEY_PASSWORD")
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            shrinkResources false
+
+            if (signingReady) {
+                signingConfig signingConfigs.release
+            }
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}

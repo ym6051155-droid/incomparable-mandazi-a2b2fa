@@ -1,33 +1,19 @@
-مكتبة SUST — نسخة V19 بأسماء تنزيل حسب المادة
+مكتبة SUST — نسخة V19 مع تطبيق Android APK
 
-هذه النسخة مبنية مباشرة على V19 وتحافظ على:
-- موضع الصورة الخاص بالعربية.
-- موضع الصورة الخاص بالإنجليزية.
-- جرس التنبيهات وnotifications.json من GitHub.
-- أيقونة Telegram.
-- جميع وظائف الموقع الموجودة في V19.
+المستودع:
+ym6051155-droid/incomparable-mandazi-a2b2fa
 
-التعديل الجديد:
-عند تنزيل الملفات تتغير الأسماء تلقائيًا اعتمادًا على اسم المادة.
+تمت إضافة:
+- زر «تحميل تطبيق أندرويد» داخل الموقع.
+- رابط التنزيل: /downloads/SUST-Library.apk
+- مشروع Android داخل android-app.
+- GitHub Actions لبناء APK تلقائيًا.
+- بناء Debug قابل للتثبيت حتى قبل إضافة أسرار التوقيع.
+- بناء Release تلقائي بعد إضافة أسرار التوقيع الأربعة.
 
-أمثلة:
-- Heat-Transfer-II-Lecture-01.pdf
-- Modeling-and-Simulation-Lecture-02.pdf
-- Process-Control-I-Tutorial-01.pdf
-- Mass-Transfer-Operations-I-Exam-01.pdf
+لا يحتاج هذا التحديث إلى تعديل Cloudflare Worker.
 
-لا تحتاج إلى إعادة تسمية الملفات داخل Cloudflare R2.
-أسماء الملفات الأصلية مثل lecture-01.pdf يمكن أن تبقى كما هي.
+بعد نجاح GitHub Actions يصبح رابط التطبيق:
+https://sust-library.site/downloads/SUST-Library.apk
 
-طريقة النشر:
-1. فك ضغط الحزمة.
-2. استبدل ملفات V19 القديمة بهذه الملفات.
-3. ارفعها إلى GitHub.
-4. اضغط Commit changes.
-5. انتظر نجاح Netlify Deploy.
-
-مهم:
-تغيير اسم الملف يعتمد على أن Cloudflare R2 يسمح لموقع:
-https://sust-library.site
-بقراءة الملفات عبر CORS.
-عند منع CORS سيُفتح الملف بالاسم الأصلي كخطة بديلة.
+قبل النشر في Google Play يجب استخدام نسخة Release موقعة بمفتاح دائم.

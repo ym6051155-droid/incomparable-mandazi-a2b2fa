@@ -1,0 +1,4 @@
+*.jks
+*.zip
+*.keystore
+secrets.properties

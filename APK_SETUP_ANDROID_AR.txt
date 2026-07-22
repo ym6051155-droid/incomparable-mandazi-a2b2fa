@@ -1,0 +1,34 @@
+إعداد تطبيق SUST Library على المستودع
+
+اسم المستودع:
+ym6051155-droid/incomparable-mandazi-a2b2fa
+
+رابط تنزيل التطبيق بعد نجاح GitHub Actions:
+https://sust-library.site/downloads/SUST-Library.apk
+
+تم إعداد سير العمل ليعمل بطريقتين:
+
+1. عند عدم إضافة أسرار التوقيع:
+   يبني GitHub نسخة Debug موقعة تلقائيًا وقابلة للتثبيت على الهاتف.
+
+2. بعد إضافة أسرار التوقيع الأربعة:
+   يبني GitHub نسخة Release موقعة بالمفتاح الدائم.
+
+تشغيل البناء:
+GitHub → Actions → Build SUST Library APK → Run workflow
+
+الملفات التي ينشئها GitHub تلقائيًا:
+- downloads/SUST-Library.apk
+- downloads/SUST-Library.apk.sha256
+- downloads/SUST-Library-build-type.txt
+
+للتوزيع المباشر الآن، نسخة Debug تعمل بصورة طبيعية.
+قبل رفع التطبيق إلى Google Play، أضف أسرار التوقيع ثم أعد تشغيل Workflow للحصول على نسخة Release ثابتة.
+
+أسماء الأسرار المطلوبة للنسخة Release:
+- SUST_KEYSTORE_BASE64
+- SUST_KEYSTORE_PASSWORD
+- SUST_KEY_ALIAS
+- SUST_KEY_PASSWORD
+
+لا ترفع ملف JKS أو ملف قيم الأسرار إلى المستودع العام.
