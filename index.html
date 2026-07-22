@@ -2,6 +2,14 @@
 
 <html dir="rtl" lang="ar">
 <head>
+
+<!--
+V19 Roman Path Fix:
+Mass Transfer Operations 1 -> mass-transfer-operations-i
+Heat Transfer 2 -> heat-transfer-ii
+Also accepts numeric legacy folders when they exist in R2.
+-->
+
 <script>(function(){try{var t=localStorage.getItem('sust-theme')||'light';document.documentElement.setAttribute('data-theme',t);var l=localStorage.getItem('sust-language')||'ar';document.documentElement.lang=l;document.documentElement.dir=l==='ar'?'rtl':'ltr';}catch(e){}})();</script><meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>SUST Library - جامعة السودان للعلوم والتكنولوجيا · SUST</title>
@@ -2112,7 +2120,7 @@ html[dir="rtl"] .course-content-arrow {
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <script>
-  window.SUST_SITE_BUILD = "v19-subject-based-filenames-20260721";
+  window.SUST_SITE_BUILD = "v19-roman-path-fix-20260722";
 </script>
 
 
@@ -2457,19 +2465,6 @@ html[dir="rtl"] .course-content-arrow {
     html[lang="en"] .lab-showcase {
       transform: translateX(-16.3px) !important;
     }
-  }
-</style>
-
-
-<style id="subject-filename-download-v19-styles">
-  .download-only-btn.is-downloading {
-    opacity: .72;
-    pointer-events: none;
-    cursor: progress;
-  }
-
-  .lecture-filename {
-    overflow-wrap: anywhere;
   }
 </style>
 
@@ -6161,12 +6156,40 @@ function updateFilterLabels() {
 }
 
 function romanizeCourseNumbers(value) {
-  var roman = {'10':'x','9':'ix','8':'viii','7':'vii','6':'vi','5':'v','4':'iv','3':'iii','2':'ii','1':'i'};
-  return String(value).replace(/(10|9|8|7|6|5|4|3|2|1)/g, function(number) { return roman[number]; });
+  var roman = {
+    '10': 'x',
+    '9': 'ix',
+    '8': 'viii',
+    '7': 'vii',
+    '6': 'vi',
+    '5': 'v',
+    '4': 'iv',
+    '3': 'iii',
+    '2': 'ii',
+    '1': 'i'
+  };
+
+  return String(value).replace(
+    /\b(10|9|8|7|6|5|4|3|2|1)\b/g,
+    function(number) {
+      return roman[number];
+    }
+  );
 }
 
 function folderSlug(value) {
   return romanizeCourseNumbers(value)
+    .normalize('NFKD')
+    .replace(/&/g, ' and ')
+    .replace(/[()\/]/g, ' ')
+    .replace(/[^a-zA-Z0-9]+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '')
+    .toLowerCase();
+}
+
+function numericFolderSlug(value) {
+  return String(value)
     .normalize('NFKD')
     .replace(/&/g, ' and ')
     .replace(/[()\/]/g, ' ')
@@ -6183,6 +6206,44 @@ function buildCourseRoot(card) {
   var semesterNumber = semester ? semester.getAttribute('data-sem') : '1';
   var courseEnglish = card.getAttribute('data-subject-en') || card.getAttribute('data-subject-ar') || 'course';
   return program + '/semester-' + semesterNumber + '/' + folderSlug(courseEnglish) + '/';
+}
+
+function buildNumericCourseRoot(card) {
+  var content = card.closest('.content');
+  var semester = card.closest('.semester');
+  var program = content
+    ? programFolderMap[content.getAttribute('data-content')]
+    : 'program';
+  var semesterNumber = semester
+    ? semester.getAttribute('data-sem')
+    : '1';
+  var courseEnglish =
+    card.getAttribute('data-subject-en') ||
+    card.getAttribute('data-subject-ar') ||
+    'course';
+
+  return (
+    program +
+    '/semester-' +
+    semesterNumber +
+    '/' +
+    numericFolderSlug(courseEnglish) +
+    '/'
+  );
+}
+
+function reconcileCourseRoots() {
+  document.querySelectorAll('.subject-card').forEach(function(card) {
+    var romanRoot = buildCourseRoot(card);
+    var numericRoot = buildNumericCourseRoot(card);
+    var selectedRoot = romanRoot;
+
+    if (!inventory[romanRoot] && inventory[numericRoot]) {
+      selectedRoot = numericRoot;
+    }
+
+    card.setAttribute('data-course-root', selectedRoot);
+  });
 }
 
 function encodeObjectKeyForWorker(key) {
@@ -6231,7 +6292,9 @@ function generatedFileLabel(category, number, language) {
 
 function normalizeFile(file) {
   var normalized = Object.assign({}, file);
-  normalized.courseRoot = String(normalized.courseRoot || '').replace(/^\/+/, '');
+  normalized.courseRoot = String(normalized.courseRoot || '')
+    .replace(/^\/+/, '')
+    .replace(/\/+$/, '') + '/';
   normalized.category = normalized.category || 'lectures';
   normalized.file = normalized.file || normalized.name || '';
   normalized.mime = normalized.mime || 'application/octet-stream';
@@ -6551,142 +6614,6 @@ function formatBytes(bytes) {
   return (bytes / Math.pow(1024, index)).toFixed(index ? 1 : 0) + ' ' + units[index];
 }
 
-
-function safeDownloadPart(value) {
-  var cleaned = String(value || '')
-    .normalize('NFKD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[\\/:*?"<>|#%&{}$!'@+=`~;,()[\]]+/g, ' ')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .replace(/^-|-$/g, '');
-
-  return cleaned || 'SUST-Course';
-}
-
-function downloadCategoryPart(category) {
-  var names = {
-    lectures: 'Lecture',
-    tutorials: 'Tutorial',
-    assessments: 'Assessment',
-    explanations: 'Explanation',
-    references: 'Reference',
-    exams: 'Exam'
-  };
-
-  return names[category] || 'File';
-}
-
-function subjectBasedDownloadName(file) {
-  var original = String(file.file || 'file.pdf');
-  var dotIndex = original.lastIndexOf('.');
-  var extension = dotIndex !== -1
-    ? original.slice(dotIndex + 1).replace(/[^a-zA-Z0-9]/g, '').toLowerCase()
-    : '';
-
-  var courseName =
-    file.courseEn ||
-    courseNameForRoot(file.courseRoot) ||
-    file.courseAr ||
-    'SUST-Course';
-
-  var number = String(file.number || '').replace(/\D/g, '');
-
-  if (!number) {
-    var numberMatch = original.match(/(\d+)(?=\.[^.]+$|$)/);
-    number = numberMatch ? numberMatch[1] : '';
-  }
-
-  if (number) number = number.padStart(2, '0');
-
-  var pieces = [
-    safeDownloadPart(courseName),
-    downloadCategoryPart(file.category)
-  ];
-
-  if (number) pieces.push(number);
-
-  return pieces.join('-') + (extension ? '.' + extension : '');
-}
-
-async function downloadWithSubjectName(file, trigger) {
-  var filename = subjectBasedDownloadName(file);
-  var originalText = trigger ? trigger.innerHTML : '';
-
-  if (trigger) {
-    trigger.classList.add('is-downloading');
-    trigger.setAttribute('aria-busy', 'true');
-    trigger.innerHTML =
-      iconMarkup('download') +
-      '<span>' + currentText('جارٍ التحميل…', 'Downloading…') + '</span>';
-  }
-
-  showStatus(
-    'جارٍ تنزيل الملف باسم ' + filename,
-    'Downloading as ' + filename
-  );
-
-  try {
-    var response = await fetch(file.url, {
-      mode: 'cors',
-      cache: 'no-store'
-    });
-
-    if (!response.ok) {
-      throw new Error('HTTP ' + response.status);
-    }
-
-    var blob = await response.blob();
-    var objectUrl = URL.createObjectURL(blob);
-    var temporaryLink = document.createElement('a');
-
-    temporaryLink.href = objectUrl;
-    temporaryLink.download = filename;
-    temporaryLink.style.display = 'none';
-
-    document.body.appendChild(temporaryLink);
-    temporaryLink.click();
-    temporaryLink.remove();
-
-    window.setTimeout(function() {
-      URL.revokeObjectURL(objectUrl);
-    }, 60000);
-
-    saveLastOpened(file);
-
-    showStatus(
-      'تم بدء التنزيل باسم ' + filename,
-      'Download started as ' + filename
-    );
-  } catch (error) {
-    /*
-      This fallback keeps the file accessible if the browser blocks
-      cross-origin Blob downloads. The filename may then be the original
-      R2 object name.
-    */
-    var fallbackLink = document.createElement('a');
-    fallbackLink.href = file.url;
-    fallbackLink.target = '_blank';
-    fallbackLink.rel = 'noopener';
-    document.body.appendChild(fallbackLink);
-    fallbackLink.click();
-    fallbackLink.remove();
-
-    saveLastOpened(file);
-
-    showStatus(
-      'تعذر تغيير الاسم تلقائيًا؛ تم فتح الملف بالاسم الأصلي',
-      'The custom filename was blocked; the original file was opened'
-    );
-  } finally {
-    if (trigger) {
-      trigger.classList.remove('is-downloading');
-      trigger.removeAttribute('aria-busy');
-      trigger.innerHTML = originalText;
-    }
-  }
-}
-
 function saveLastOpened(file) {
   lastOpened = {
     courseRoot: file.courseRoot,
@@ -6697,7 +6624,6 @@ function saveLastOpened(file) {
     labelEn: file.labelEn,
     courseAr: file.courseAr || '',
     courseEn: file.courseEn || '',
-    downloadName: subjectBasedDownloadName(file),
     openedAt: new Date().toISOString()
   };
   writeJSON('sust-last-opened', lastOpened);
@@ -6721,17 +6647,15 @@ function renderContinue() {
     '<div class="continue-file">' +
       '<div><div class="continue-title">' + escapeHTML(title) + '</div>' +
       '<div class="continue-meta">' + escapeHTML(course) + ' · ' + escapeHTML(categoryName(lastOpened.category)) + '</div></div>' +
-      '<a class="download-only-btn" href="' + encodeURI(lastOpened.url) + '"' +
-        ' download="' + escapeHTML(lastOpened.downloadName || subjectBasedDownloadName(lastOpened)) + '">' +
+      '<a class="download-only-btn" href="' + encodeURI(lastOpened.url) + '" download>' +
         iconMarkup('download') + '<span>' + currentText('تحميل', 'Download') + '</span>' +
       '</a>' +
     '</div>';
 
   var link = content.querySelector('a');
   if (link) {
-    link.addEventListener('click', function(event) {
-      event.preventDefault();
-      downloadWithSubjectName(lastOpened, link);
+    link.addEventListener('click', function() {
+      showStatus('بدأ تنزيل آخر ملف فتحته', 'Downloading your last opened file');
     });
   }
 }
@@ -6859,12 +6783,11 @@ function openResourceCategory(card, category) {
           '<span class="lecture-number">' + escapeHTML(file.number || '') + '</span>' +
           '<span class="lecture-details">' +
             '<span class="lecture-label">' + escapeHTML(fileDisplayTitle(file)) + '</span>' +
-            '<span class="lecture-filename">' + escapeHTML(subjectBasedDownloadName(file)) + '</span>' +
+            '<span class="lecture-filename">' + escapeHTML(file.file) + '</span>' +
             '<span class="file-meta-line"><span>' + metadata.map(escapeHTML).join('</span><span>') + '</span></span>' +
           '</span>' +
           '<span class="file-row-actions">' +
-            '<a class="download-only-btn" href="' + encodeURI(file.url) + '"' +
-              ' download="' + escapeHTML(subjectBasedDownloadName(file)) + '">' +
+            '<a class="download-only-btn" href="' + encodeURI(file.url) + '" download>' +
               iconMarkup('download') + '<span>' + currentText('تحميل', 'Download') + '</span>' +
             '</a>' +
             '<button class="report-link" type="button">' +
@@ -6875,10 +6798,7 @@ function openResourceCategory(card, category) {
 
       var download = row.querySelector('a');
       var report = row.querySelector('.report-link');
-      download.addEventListener('click', function(event) {
-        event.preventDefault();
-        downloadWithSubjectName(file, download);
-      });
+      download.addEventListener('click', function() { saveLastOpened(file); });
       report.addEventListener('click', function() { reportBrokenFile(file); });
       list.appendChild(row);
     });
@@ -7418,6 +7338,7 @@ async function initialize() {
 
   await loadLibraryData();
   buildInventory(libraryData);
+  reconcileCourseRoots();
   libraryReady = true;
 
   createResourceFolders();
