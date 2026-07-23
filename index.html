@@ -13,7 +13,7 @@ Also accepts numeric legacy folders when they exist in R2.
 <script>(function(){try{var t=localStorage.getItem('sust-theme')||'light';document.documentElement.setAttribute('data-theme',t);var l=localStorage.getItem('sust-language')||'ar';document.documentElement.lang=l;document.documentElement.dir=l==='ar'?'rtl':'ltr';}catch(e){}})();</script><meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 
-<meta name="description" content="مكتبة طلابية مستقلة وغير رسمية لطلاب جامعة السودان للعلوم والتكنولوجيا SUST، توفر المحاضرات والتوتريالات والشروحات والمراجع والامتحانات مرتبة حسب التخصص والفصل الدراسي.">
+<meta name="description" content="مكتبة طلابية مستقلة وغير رسمية لطلاب جامعة السودان للعلوم والتكنولوجيا SUST، توفر المحاضرات والتوتريالات والمراجع والامتحانات مرتبة حسب التخصص والفصل الدراسي.">
 <meta name="keywords" content="جامعة السودان للعلوم والتكنولوجيا, مكتبة SUST, SUST Library, محاضرات جامعة السودان, امتحانات جامعة السودان, كلية هندسة وتكنولوجيا الصناعات">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <link rel="canonical" href="https://sust-library.site/">
@@ -2642,7 +2642,7 @@ html[dir="rtl"] .course-content-arrow {
 </div>
 <div class="hero"><div class="hero-kicker" data-ar="مكتبة أكاديمية موحّدة" data-en="Unified academic resource hub">مكتبة أكاديمية موحّدة</div>
 <h1 data-ar="مكتبة SUST الأكاديمية" data-en="SUST Academic Library">مكتبة SUST الأكاديمية</h1>
-<p data-ar="تصفح المحاضرات والتوتريالات والمتابعات والشروحات والمراجع والامتحانات حسب التخصص والفصل الدراسي في مكان واحد منظم." data-en="Browse lectures, tutorials, assessments, explanations, references, and exams by program and semester in one organized place.">تصفح محاضرات كلية هندسة وتكنولوجيا الصناعات حسب التخصص والفصل الدراسي في مكان واحد منظم وسهل الاستخدام.</p>
+<p data-ar="تصفح المحاضرات والتوتريالات والمراجع والامتحانات حسب التخصص والفصل الدراسي في مكان واحد منظم." data-en="Browse lectures, tutorials, references, and exams by program and semester in one organized place.">تصفح محاضرات كلية هندسة وتكنولوجيا الصناعات حسب التخصص والفصل الدراسي في مكان واحد منظم وسهل الاستخدام.</p>
 <div class="search-wrapper">
 <span class="search-icon" aria-hidden="true"><svg class="ui-icon" aria-hidden="true"><use href="#icon-search"></use></svg></span>
 <input aria-label="ابحث باسم المادة بالعربية أو الإنجليزية..." autocomplete="off" class="search-input" data-placeholder-ar="ابحث باسم المادة بالعربية أو الإنجليزية..." data-placeholder-en="Search by course name in Arabic or English..." id="searchInput" placeholder="ابحث باسم المادة بالعربية أو الإنجليزية..." type="text"/>
@@ -2667,8 +2667,6 @@ html[dir="rtl"] .course-content-arrow {
       <option value="" data-ar="كل الأقسام" data-en="All categories">كل الأقسام</option>
       <option value="lectures" data-ar="المحاضرات" data-en="Lectures">المحاضرات</option>
       <option value="tutorials" data-ar="التوتريالات" data-en="Tutorials">التوتريالات</option>
-      <option value="assessments" data-ar="المتابعات" data-en="Assessments">المتابعات</option>
-      <option value="explanations" data-ar="الشرح" data-en="Explanations">الشرح</option>
       <option value="references" data-ar="المراجع" data-en="References">المراجع</option>
       <option value="exams" data-ar="الامتحانات" data-en="Exams">الامتحانات</option>
     </select>
@@ -6106,8 +6104,6 @@ var lastOpened = readJSON('sust-last-opened', null);
 var resourceCategories = [
   { key: 'lectures', iconId: 'book-open', ar: 'المحاضرات', en: 'Lectures' },
   { key: 'tutorials', iconId: 'clipboard-list', ar: 'التوتريالات', en: 'Tutorials' },
-  { key: 'assessments', iconId: 'check-square', ar: 'المتابعات', en: 'Assessments' },
-  { key: 'explanations', iconId: 'lightbulb', ar: 'الشرح', en: 'Explanations' },
   { key: 'references', iconId: 'library', ar: 'المراجع', en: 'References' },
   { key: 'exams', iconId: 'file-text', ar: 'الامتحانات', en: 'Exams' }
 ];
@@ -6350,8 +6346,6 @@ function generatedFileLabel(category, number, language) {
   var labels = {
     lectures: ['المحاضرة', 'Lecture'],
     tutorials: ['التوتريال', 'Tutorial'],
-    assessments: ['المتابعة', 'Assessment'],
-    explanations: ['الشرح', 'Explanation'],
     references: ['المرجع', 'Reference'],
     exams: ['الامتحان', 'Exam']
   };
